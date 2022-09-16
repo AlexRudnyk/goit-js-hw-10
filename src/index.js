@@ -20,7 +20,9 @@ function onSearch(event) {
   refs.countryInfoEl.innerHTML = '';
   if (country !== '') {
     fetchCountries(country).then(countriesArr => {
-      if (countriesArr.length > 10) {
+      if (countriesArr.status === 404) {
+        return Notify.failure('Oops, there is no country with that name');
+      } else if (countriesArr.length > 10) {
         Notify.info(
           'Too many matches found. Please enter a more specific name.'
         );
@@ -63,11 +65,13 @@ function createCountryInfoMarkup(country) {
       return `
     <div class='country-container'>
     <img class='country-container__img' src='${flags.svg}' alt='flag'>
-    <p>${name.official}</p>
+    <p class='country-container__text'>${name.official}</p>
     </div>
-    <p class='country-descr'><span class='country-descr__span'>Capital: </span>${capital}</p>
-    <p class='country-descr'><span class='country-descr__span'>Population: </span>${population}</p>
-    <p class='country-descr'><span class='country-descr__span'>Languages: </span>${languages.spa}</p>
+    <p class='country-descr'><span class='country-descr__span'><b>Capital: </b></span>${capital}</p>
+    <p class='country-descr'><span class='country-descr__span'><b>Population: </b></span>${population}</p>
+    <p class='country-descr'><span class='country-descr__span'><b>Languages: </b></span>${Object.values(
+      languages
+    )}</p>
     `;
     })
     .join('');
