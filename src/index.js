@@ -3,7 +3,7 @@ import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import { fetchCountries } from './fetchCountries';
 import debounce from 'lodash.debounce';
 
-const DEBOUNCE_DELAY = 300;
+const DEBOUNCE_DELAY = 500;
 
 const refs = {
   inputElement: document.querySelector('#search-box'),
@@ -27,12 +27,20 @@ function onSearch(event) {
           'Too many matches found. Please enter a more specific name.'
         );
       } else if (countriesArr.length > 1 && countriesArr.length <= 10) {
-        console.log('countriesArr: ', countriesArr);
         refs.countryListEl.insertAdjacentHTML(
           'beforeend',
           createCountryListMarkup(countriesArr)
         );
       } else if (countriesArr.length === 1) {
+        refs.countryInfoEl.insertAdjacentHTML(
+          'beforeend',
+          createCountryInfoMarkup(countriesArr)
+        );
+      }
+      refs.countryListEl.addEventListener('click', onSpecificCountryClick);
+      function onSpecificCountryClick() {
+        refs.countryListEl.innerHTML = '';
+        refs.countryInfoEl.innerHTML = '';
         refs.countryInfoEl.insertAdjacentHTML(
           'beforeend',
           createCountryInfoMarkup(countriesArr)
@@ -61,7 +69,6 @@ function createCountryListMarkup(countries) {
 function createCountryInfoMarkup(country) {
   return country
     .map(({ population, capital, languages, name, flags }) => {
-      const qwe = languages;
       return `
     <div class='country-container'>
     <img class='country-container__img' src='${flags.svg}' alt='flag'>
