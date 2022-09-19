@@ -37,14 +37,23 @@ function onSearch(event) {
           createCountryInfoMarkup(countriesArr)
         );
       }
-      refs.countryListEl.addEventListener('click', onSpecificCountryClick);
-      function onSpecificCountryClick() {
+      refs.countryListEl.addEventListener('click', onSpecificCountryNameClick);
+      function onSpecificCountryNameClick(event) {
         refs.countryListEl.innerHTML = '';
         refs.countryInfoEl.innerHTML = '';
-        refs.countryInfoEl.insertAdjacentHTML(
-          'beforeend',
-          createCountryInfoMarkup(countriesArr)
-        );
+        const specificCountryName = event.target.textContent;
+        fetchCountries(specificCountryName)
+          .then(specCountry => {
+            refs.countryListEl.innerHTML = '';
+            refs.countryInfoEl.innerHTML = '';
+            refs.countryInfoEl.insertAdjacentHTML(
+              'beforeend',
+              createSpecCountryInfoMarkup(specCountry)
+            );
+          })
+          .catch(error => {
+            Notify.info('Please, tap on the country name');
+          });
       }
     });
   } else {
@@ -67,6 +76,24 @@ function createCountryListMarkup(countries) {
 }
 
 function createCountryInfoMarkup(country) {
+  return country
+    .map(({ population, capital, languages, name, flags }) => {
+      return `
+    <div class='country-container'>
+    <img class='country-container__img' src='${flags.svg}' alt='flag'>
+    <p class='country-container__text'>${name.official}</p>
+    </div>
+    <p class='country-descr'><span class='country-descr__span'><b>Capital: </b></span>${capital}</p>
+    <p class='country-descr'><span class='country-descr__span'><b>Population: </b></span>${population}</p>
+    <p class='country-descr'><span class='country-descr__span'><b>Languages: </b></span>${Object.values(
+      languages
+    )}</p>
+    `;
+    })
+    .join('');
+}
+
+function createSpecCountryInfoMarkup(country) {
   return country
     .map(({ population, capital, languages, name, flags }) => {
       return `
